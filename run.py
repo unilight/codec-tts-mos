@@ -75,7 +75,6 @@ def main():
             print(f"Error processing {file_id}: {e}")
             import traceback
             traceback.print_exc()
-            exit()
 
     print(f"Generation complete. Results saved to {model_dir}")
 

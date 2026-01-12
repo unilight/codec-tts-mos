@@ -1,5 +1,6 @@
 from .xtts_v2 import XTTSv2Model
 from .llasa_1b import Llasa1BModel
+from .llasa_1b_multilingual import Llasa1BMultilingualModel
 from .fireredtts import FireRedTTSModel
 from .cosyvoice2 import CosyVoice2Model
 from .sparktts import SparkTTSModel
@@ -11,11 +12,14 @@ from .orpheustts import OrpheusTTSModel
 # from .higgs_audio import HiggsAudioModel 
 from .tortoise_tts import TortoiseTTSModel
 from .openaudio_s1 import OpenAudioS1Model
+from .t5gemma_tts import T5GemmaTTSModel
+from .openvoice_v2 import OpenVoiceV2TTSModel
 
 # This registry maps command-line arguments to Model Classes
 AVAILABLE_MODELS = {
     "xtts": XTTSv2Model,
     "llasa": Llasa1BModel,
+    "llasa_1b_multilingual": Llasa1BMultilingualModel,
     "fireredtts": FireRedTTSModel,
     "cosyvoice2": CosyVoice2Model,
     "sparktts": SparkTTSModel,
@@ -27,6 +31,8 @@ AVAILABLE_MODELS = {
     # "higgs": HiggsAudioModel,
     "tortoise": TortoiseTTSModel,
     "openaudio": OpenAudioS1Model,
+    "t5gemma-tts": T5GemmaTTSModel,
+    "openvoice_v2": OpenVoiceV2TTSModel,
 }
 
 def get_model(model_name, device=None):

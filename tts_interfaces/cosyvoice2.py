@@ -36,8 +36,12 @@ class CosyVoice2Model(BaseTTSModel):
 
     def generate(self, text, ref_audio_path, output_path, language="en", ref_text=None):
         from cosyvoice.utils.file_utils import load_wav
-        prompt_speech_16k = load_wav(ref_audio_path, 16000)[:16000*30]
-        audios = list(self.model.inference_zero_shot(text, ref_text, prompt_speech_16k, stream=False))
+
+        # prompt_speech_16k = load_wav(ref_audio_path, 16000)[:16000*30]
+        # audios = list(self.model.inference_zero_shot(text, ref_text, prompt_speech_16k, stream=False))
+
+        audios = list(self.model.inference_zero_shot(text, ref_text, ref_audio_path, stream=False))
+
         assert len(audios) == 1
         audio = audios[0]["tts_speech"]
 
