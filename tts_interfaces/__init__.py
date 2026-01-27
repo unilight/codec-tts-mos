@@ -1,44 +1,50 @@
-from .xtts_v2 import XTTSv2Model
-from .llasa_1b import Llasa1BModel
-from .llasa_1b_multilingual import Llasa1BMultilingualModel
-from .fireredtts import FireRedTTSModel
-from .cosyvoice2 import CosyVoice2Model
-from .sparktts import SparkTTSModel
-from .vallex import ValleXModel
-from .chatterbox import ChatterboxTTSModel
-from .chatterbox_mtl import ChatterboxMultilingualTTSModel
-from .indextts import IndexTTSModel
-from .orpheustts import OrpheusTTSModel
-# from .higgs_audio import HiggsAudioModel 
-from .tortoise_tts import TortoiseTTSModel
-from .openaudio_s1 import OpenAudioS1Model
-from .t5gemma_tts import T5GemmaTTSModel
-from .openvoice_v2 import OpenVoiceV2TTSModel
+import importlib
 
-# This registry maps command-line arguments to Model Classes
-AVAILABLE_MODELS = {
-    "xtts": XTTSv2Model,
-    "llasa": Llasa1BModel,
-    "llasa_1b_multilingual": Llasa1BMultilingualModel,
-    "fireredtts": FireRedTTSModel,
-    "cosyvoice2": CosyVoice2Model,
-    "sparktts": SparkTTSModel,
-    "valle-x": ValleXModel,
-    "chatterbox": ChatterboxTTSModel,
-    "chatterbox-mtl": ChatterboxMultilingualTTSModel,
-    "indextts": IndexTTSModel,
-    "orpheus-tts": OrpheusTTSModel,
-    # "higgs": HiggsAudioModel,
-    "tortoise": TortoiseTTSModel,
-    "openaudio": OpenAudioS1Model,
-    "t5gemma-tts": T5GemmaTTSModel,
-    "openvoice_v2": OpenVoiceV2TTSModel,
+# Registry maps: model_name -> (module_relative_path, class_name)
+# This defines the available models without actually importing their code yet.
+MODEL_REGISTRY = {
+    "xtts": (".xtts_v2", "XTTSv2Model"),
+    "llasa": (".llasa_1b", "Llasa1BModel"),
+    "llasa_1b": (".llasa_1b", "Llasa1BModel"),
+    "llasa_3b": (".llasa_1b", "Llasa3BModel"),
+    "llasa_8b": (".llasa_1b", "Llasa8BModel"),
+    "llasa_1b_multilingual": (".llasa_1b_multilingual", "Llasa1BMultilingualModel"),
+    "fireredtts": (".fireredtts", "FireRedTTSModel"),
+    "cosyvoice2": (".cosyvoice2", "CosyVoice2Model"),
+    "sparktts": (".sparktts", "SparkTTSModel"),
+    "valle-x": (".vallex", "ValleXModel"),
+    "chatterbox": (".chatterbox", "ChatterboxTTSModel"),
+    "chatterbox-mtl": (".chatterbox_mtl", "ChatterboxMultilingualTTSModel"),
+    "indextts": (".indextts", "IndexTTSModel"),
+    "orpheus-tts": (".orpheustts", "OrpheusTTSModel"),
+    # "higgs": (".higgs_audio", "HiggsAudioModel"),
+    "tortoise": (".tortoise_tts", "TortoiseTTSModel"),
+    "openaudio": (".openaudio_s1", "OpenAudioS1Model"),
+    "t5gemma-tts": (".t5gemma_tts", "T5GemmaTTSModel"),
+    "openvoice_v2": (".openvoice_v2", "OpenVoiceV2TTSModel"),
+    "maskgct": (".maskgct", "MaskGCTModel"),
+    "vevo": (".vevo", "VevoTTSModel"),
+    "voicestar": (".voicestar", "VoiceStarModel"),
+    "neutts_air": (".neutts_air", "NeuTTSAirModel"),
 }
 
+# We expose the keys so `run.py` can still use `AVAILABLE_MODELS.keys()` for argparse choices
+AVAILABLE_MODELS = MODEL_REGISTRY
+
 def get_model(model_name, device=None):
-    """Factory function to instantiate a model by name."""
-    if model_name not in AVAILABLE_MODELS:
-        raise ValueError(f"Model '{model_name}' not found. Available: {list(AVAILABLE_MODELS.keys())}")
+    """Factory function to lazily instantiate a model by name."""
+    if model_name not in MODEL_REGISTRY:
+        raise ValueError(f"Model '{model_name}' not found. Available: {list(MODEL_REGISTRY.keys())}")
     
-    model_class = AVAILABLE_MODELS[model_name]
+    module_path, class_name = MODEL_REGISTRY[model_name]
+    
+    print(f"[Lazy Import] Importing {class_name} from {module_path}...")
+    
+    # Dynamically import the module using importlib
+    # package=__package__ ensures relative imports (like .maskgct) work correctly
+    module = importlib.import_module(module_path, package=__package__)
+    
+    # Get the class from the module
+    model_class = getattr(module, class_name)
+    
     return model_class(device=device)

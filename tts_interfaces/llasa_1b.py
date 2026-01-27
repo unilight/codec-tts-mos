@@ -5,23 +5,30 @@ import os
 
 from .base import BaseTTSModel
 
-class Llasa1BModel(BaseTTSModel):
+llasa_1b = 'HKUSTAudio/Llasa-1b'
+llasa_3b = 'HKUSTAudio/Llasa-3b'
+llasa_8b = 'HKUSTAudio/Llasa-8b'
+
+class LlasaBaseModel(BaseTTSModel):
     def __init__(self, device=None):
         super().__init__(device)
         self.tokenizer = None
         self.model = None
         self.codec_model = None
+        self.model_id = self.get_model_id()
         self.load_model()
 
+    def get_model_id(self):
+        pass
+
     def load_model(self):
-        print("Loading Llasa-1B and XCodec2...")
+        print(f"Loading {self.model_id} and XCodec2...")
         from transformers import AutoTokenizer, AutoModelForCausalLM
         # Ensure xcodec2 is installed or in python path
         from xcodec2.modeling_xcodec2 import XCodec2Model
-
-        llasa_1b = 'HKUSTAudio/Llasa-1b'
-        self.tokenizer = AutoTokenizer.from_pretrained(llasa_1b)
-        self.model = AutoModelForCausalLM.from_pretrained(llasa_1b)
+        
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_id)
         self.model.eval()
         self.model.to(self.device)
 
@@ -48,13 +55,15 @@ class Llasa1BModel(BaseTTSModel):
                 print(f"Unexpected token: {token_str}")
         return speech_ids
 
-    def generate(self, text, ref_audio_path, output_path, language="en", ref_text=None):
+    def generate(self, text, ref_audio_path, output_path, language="en", ref_text=None, ref_start=None, ref_end=None):
         if ref_text is None:
             print(f"Warning: Llasa-1B works best with reference text. Using empty string for ref_text.")
             ref_text = ""
 
         # 1. Process Audio Prompt
-        prompt_wav, sr = librosa.load(ref_audio_path, sr=16000)
+        prompt_wav, sr = librosa.load(ref_audio_path, sr=16000,
+            offset=ref_start, duration=ref_end - ref_start if (ref_start is not None and ref_end is not None) else None
+        )
         prompt_wav = torch.from_numpy(prompt_wav).float().unsqueeze(0)
         if self.device == 'cuda':
             prompt_wav = prompt_wav.cuda()
@@ -128,3 +137,15 @@ class Llasa1BModel(BaseTTSModel):
                 final_wav = gen_wav[0, 0, :].cpu().numpy()
 
             sf.write(output_path, final_wav, 16000)
+
+class Llasa1BModel(LlasaBaseModel):
+    def get_model_id(self):
+        return llasa_1b
+
+class Llasa3BModel(LlasaBaseModel):
+    def get_model_id(self):
+        return llasa_3b
+
+class Llasa8BModel(LlasaBaseModel):
+    def get_model_id(self):
+        return llasa_8b
