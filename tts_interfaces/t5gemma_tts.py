@@ -164,7 +164,7 @@ class T5GemmaTTSModel(BaseTTSModel):
             concat_audio, gen_audio = res
             
             # Move to CPU and numpy
-            gen_audio_np = gen_audio[0].cpu().float().numpy()
+            gen_audio_np = gen_audio[0].cpu().float().numpy().squeeze()
             
             # Save
             sf.write(output_path, gen_audio_np, self.audio_tokenizer.sample_rate)

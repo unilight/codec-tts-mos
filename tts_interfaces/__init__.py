@@ -23,9 +23,11 @@ MODEL_REGISTRY = {
     "t5gemma-tts": (".t5gemma_tts", "T5GemmaTTSModel"),
     "openvoice_v2": (".openvoice_v2", "OpenVoiceV2TTSModel"),
     "maskgct": (".maskgct", "MaskGCTModel"),
-    "vevo": (".vevo", "VevoTTSModel"),
+    "vevo": (".vevotts", "VevoTTSModel"),
     "voicestar": (".voicestar", "VoiceStarModel"),
     "neutts_air": (".neutts_air", "NeuTTSAirModel"),
+    "qwen3_tts_0_6b": (".qwen3_tts", "Qwen3_0_6B"),
+    "qwen3_tts_1_7b": (".qwen3_tts", "Qwen3_1_7B"),
 }
 
 # We expose the keys so `run.py` can still use `AVAILABLE_MODELS.keys()` for argparse choices
