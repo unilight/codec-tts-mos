@@ -20,6 +20,7 @@ MODEL_REGISTRY = {
     # "higgs": (".higgs_audio", "HiggsAudioModel"),
     "tortoise": (".tortoise_tts", "TortoiseTTSModel"),
     "openaudio": (".openaudio_s1", "OpenAudioS1Model"),
+    "fishaudio-s2-pro": (".fishaudio_s2_pro", "FishAudioS2ProModel"),
     "t5gemma-tts": (".t5gemma_tts", "T5GemmaTTSModel"),
     "openvoice_v2": (".openvoice_v2", "OpenVoiceV2TTSModel"),
     "maskgct": (".maskgct", "MaskGCTModel"),
